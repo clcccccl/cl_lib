@@ -32,7 +32,7 @@ class PgDB:
         self.password = pd_map['password']
         self.conn = psycopg2.connect(host=self.host, port=self.port,
                                      database=self.db_name, user=self.user, password=self.password)
-        print '连接到数据库－－－' + self.host
+        print '连接到数据库:' + self.host
 
     def query(self, sql):
         out = []
