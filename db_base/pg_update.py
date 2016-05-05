@@ -46,13 +46,14 @@ def insert(table_name, values_list):
     传入表名,要插入的数据[{}]
     因为数据表使用class创建,继承了基础表,在添加数据时加入基础表默认值
     '''
-    columns = 'status,'
+    columns = 'create_date,modify_date,status,'
     keys = values_list[0].keys()
     for key in keys:
         columns += (key + ',')
     values = ''
     for value_map in values_list:
-        value = "0"
+        time_str = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+        value = "'" + time_str + "','" + time_str + "',0"
         for value_one in value_map.values():
             if type(value_one) == long or type(value_one) == int:
                 value = value + ',' + repr(value_one)
@@ -69,11 +70,12 @@ def insert(table_name, values_list):
 
 
 def insertOne(table_name, value_map):
-    columns = 'status,'
+    columns = 'create_date,modify_date,status,'
     keys = value_map.keys()
     for key in keys:
         columns = columns + key + ','
-    value = "0"
+    time_str = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+    value = "'" + time_str + "','" + time_str + "',0"
     for value_one in value_map.values():
         if type(value_one) == long or type(value_one) == int:
             value = value + ',' + repr(value_one)
@@ -92,8 +94,10 @@ def update(table_name, value_map, where='1=1'):
         del value_map['modify_date']
     if value_map['create_date']:
         del value_map['create_date']
-    set_value = "modify_date = '" + time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()) + "',"
+    time_str = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+    set_value = "modify_date = '" + time_str + "',"
     keys = value_map.keys()
+    values = value_map.values()
     for key in keys:
         if type(value_map[key]) == long or type(value_map[key]) == int:
             set_value = set_value + key + "=" + repr(value_map[key]) + ","
@@ -172,13 +176,13 @@ def dropTable(the_model):
         print "数据表不存在"
 
 if __name__ == "__main__":
-    insertOne('user_info', {'name': "穿件", 'account': '234', 'password': 'ly'})
+    # insertOne('user_info', {'name': "穿件", 'account': '234', 'password': 'ly'})
     # sql = '''
     # select * from user_info
     # '''
     # update('user_info', {'name': "穿件", 'account': '2234', 'password': 'ly'}, where="id=1")
     # datas = select(where='1=1', columns="name,id", limit=1, table_name="user_info")
     # print datas
-    # relDelete('user_info')
-    # insertOne('user_info', {'name': "穿件", 'account': '234', 'password': 'ly'})
+    relDelete('user_info')
+    insertOne('user_info', {'name': "穿件", 'account': '234', 'password': 'ly'})
     pass
