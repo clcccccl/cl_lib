@@ -46,6 +46,8 @@ def insert(table_name, values_list):
     传入表名,要插入的数据[{}]
     因为数据表使用class创建,继承了基础表,在添加数据时加入基础表默认值
     '''
+    if len(values_list) == 0:
+        return
     columns = 'create_date,modify_date,status,'
     keys = values_list[0].keys()
     for key in keys:
@@ -90,9 +92,9 @@ def insertOne(table_name, value_map):
 
 
 def update(table_name, value_map, where='1=1'):
-    if value_map['modify_date']:
+    if value_map.get('modify_date'):
         del value_map['modify_date']
-    if value_map['create_date']:
+    if value_map.get('create_date'):
         del value_map['create_date']
     time_str = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
     set_value = "modify_date = '" + time_str + "',"
