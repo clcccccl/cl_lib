@@ -16,10 +16,11 @@ def select(table_name, columns='*', where='', limit=10, offset=0, order_by="crea
     传入表名,要搜索的列(默认为*),查询条件,分页
     返回一个list,其中元素为map:[{}]
     '''
+    limit_str = '' if limit == -1 else ' limit %s ' % limit
     where = ' status = 0 ' if where == '' else (where + ' and status = 0 ')
     sql = '''
-        select %s from %s where %s order by %s limit %d offset %d
-    ''' % (columns, table_name, where, order_by, limit, offset)
+        select %s from %s where %s order by %s %s offset %d
+    ''' % (columns, table_name, where, order_by, limit_str, offset)
     return selectBySql(sql)
 
 

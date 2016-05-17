@@ -70,7 +70,7 @@ class PgDB:
 def connect():
     global pg_db
     global db
-    pg_db = PgDB(tools.getIniConfig({'group': 'pg_db', 'keys': ['port', 'host', 'db_name', 'user', 'password']}, '/Users/chenli/dream/coonever/config.ini'))
+    pg_db = PgDB(tools.getIniConfig({'group': 'pg_db', 'keys': ['port', 'host', 'db_name', 'user', 'password']}, './config.ini'))
     db = pg_db.get_db()
 
 
