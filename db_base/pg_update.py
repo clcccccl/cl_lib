@@ -52,7 +52,7 @@ def insert(table_name, values_list):
     columns = 'create_date,modify_date,status,' + ','.join(values_list[0].keys())
     values = ''
     for value_map in values_list:
-        value = " now(), now()" + "',0"
+        value = " now(), now() ,0"
         for value_one in value_map.values():
             if type(value_one) == long or type(value_one) == int:
                 value = value + ',' + repr(value_one)
@@ -64,13 +64,13 @@ def insert(table_name, values_list):
     values = values[0:-1]
     sql = '''
         insert into %s (%s) values %s ;
-    ''' % (table_name, columns[0:-1], values)
+    ''' % (table_name, columns, values)
     pg_base.pg_db.modifyData(sql)
 
 
 def insertOne(table_name, value_map):
     columns = 'create_date,modify_date,status,' + ','.join(value_map.keys())
-    value = " now(), now()" + "',0"
+    value = " now(), now() ,0"
     for value_one in value_map.values():
         if type(value_one) == long or type(value_one) == int:
             value = value + ',' + repr(value_one)
@@ -80,7 +80,7 @@ def insertOne(table_name, value_map):
             value = value + ",'" + value_one + "'"
     sql = '''
         insert into %s (%s) values (%s) ;
-    ''' % (table_name, columns[0:-1], value)
+    ''' % (table_name, columns, value)
     pg_base.pg_db.modifyData(sql)
 
 
@@ -89,7 +89,7 @@ def update(table_name, value_map, where='1=1'):
         del value_map['modify_date']
     if value_map.get('create_date'):
         del value_map['create_date']
-    set_value = "modify_date = now(), "
+    set_value = ''
     for key in value_map.keys():
         if type(value_map[key]) == long or type(value_map[key]) == int:
             set_value = set_value + key + "=" + repr(value_map[key]) + ","
@@ -97,7 +97,7 @@ def update(table_name, value_map, where='1=1'):
             set_value = set_value + key + "='" + value_map[key].encode('utf-8') + "',"
         elif type(value_map[key]) == str:
             set_value = set_value + key + "='" + value_map[key] + "',"
-    set_value = set_value[:-1]
+    set_value = "modify_date = now(), " + set_value[:-1] if set_value else "modify_date = now()"
     sql = '''
         update %s set %s where %s ;
     ''' % (table_name, set_value, where)
