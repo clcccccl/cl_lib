@@ -49,14 +49,10 @@ def insert(table_name, values_list):
     '''
     if len(values_list) == 0:
         return
-    columns = 'create_date,modify_date,status,'
-    keys = values_list[0].keys()
-    for key in keys:
-        columns += (key + ',')
+    columns = 'create_date,modify_date,status,' + ','.join(values_list[0].keys())
     values = ''
     for value_map in values_list:
-        time_str = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
-        value = "'" + time_str + "','" + time_str + "',0"
+        value = " now(), now()" + "',0"
         for value_one in value_map.values():
             if type(value_one) == long or type(value_one) == int:
                 value = value + ',' + repr(value_one)
@@ -73,12 +69,8 @@ def insert(table_name, values_list):
 
 
 def insertOne(table_name, value_map):
-    columns = 'create_date,modify_date,status,'
-    keys = value_map.keys()
-    for key in keys:
-        columns = columns + key + ','
-    time_str = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
-    value = "'" + time_str + "','" + time_str + "',0"
+    columns = 'create_date,modify_date,status,' + ','.join(value_map.keys())
+    value = " now(), now()" + "',0"
     for value_one in value_map.values():
         if type(value_one) == long or type(value_one) == int:
             value = value + ',' + repr(value_one)
@@ -97,11 +89,8 @@ def update(table_name, value_map, where='1=1'):
         del value_map['modify_date']
     if value_map.get('create_date'):
         del value_map['create_date']
-    time_str = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
-    set_value = "modify_date = '" + time_str + "',"
-    keys = value_map.keys()
-    values = value_map.values()
-    for key in keys:
+    set_value = "modify_date = now(), "
+    for key in value_map.keys():
         if type(value_map[key]) == long or type(value_map[key]) == int:
             set_value = set_value + key + "=" + repr(value_map[key]) + ","
         elif type(value_map[key]) == unicode:
@@ -117,7 +106,7 @@ def update(table_name, value_map, where='1=1'):
 
 def delete(table_name, where='1=1'):
     sql = '''
-        update %s set status = 1 where %s ;
+        update %s set modify_date = now(),status = 1 where %s ;
     ''' % (table_name, where)
     pg_base.pg_db.modifyData(sql)
 
@@ -179,13 +168,6 @@ def dropTable(the_model):
         print "数据表不存在"
 
 if __name__ == "__main__":
-    # insertOne('user_info', {'name': "穿件", 'account': '234', 'password': 'ly'})
-    # sql = '''
-    # select * from user_info
-    # '''
-    # update('user_info', {'name': "穿件", 'account': '2234', 'password': 'ly'}, where="id=1")
-    # datas = select(where='1=1', columns="name,id", limit=1, table_name="user_info")
-    # print datas
     relDelete('user_info')
     insertOne('user_info', {'name': "穿件", 'account': '234', 'password': 'ly'})
     pass
