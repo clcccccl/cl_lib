@@ -68,7 +68,9 @@ def insert(table_name, values_list):
     pg_base.pg_db.modifyData(sql)
 
 
-def insertOne(table_name, value_map):
+def insertOne(table_name, value_map, return_id=False):
+    if return_id:
+        value_map['id'] = getSeq(table_name)
     columns = 'create_date,modify_date,status,' + ','.join(value_map.keys())
     value = " now(), now() ,0"
     for value_one in value_map.values():
@@ -82,6 +84,7 @@ def insertOne(table_name, value_map):
         insert into %s (%s) values (%s) ;
     ''' % (table_name, columns, value)
     pg_base.pg_db.modifyData(sql)
+    return value_map['id'] if return_id else None
 
 
 def update(table_name, value_map, where='1=1'):
@@ -104,9 +107,16 @@ def update(table_name, value_map, where='1=1'):
     pg_base.pg_db.modifyData(sql)
 
 
-def delete(table_name, where='1=1'):
+def softDelete(table_name, where='1=1'):
     sql = '''
         update %s set modify_date = now(),status = 1 where %s ;
+    ''' % (table_name, where)
+    pg_base.pg_db.modifyData(sql)
+
+
+def delete(table_name, where='1=1'):
+    sql = '''
+        delete from %s where %s ;
     ''' % (table_name, where)
     pg_base.pg_db.modifyData(sql)
 
@@ -122,7 +132,7 @@ def getSeq(table_name):
     sql = '''
         select nextval('%s_id_seq') as new_id
     ''' % table_name
-    return pg_base.pg_db.query(sql)[0]['new_id']
+    return int(pg_base.pg_db.query(sql)[0]['new_id'])
 
 
 def reCreateTable(the_model):

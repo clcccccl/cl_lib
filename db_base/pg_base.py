@@ -35,28 +35,37 @@ class PgDB:
         print '连接到数据库:' + self.host
 
     def query(self, sql):
-        out = []
-        self.cursor = self.conn.cursor()
-        self.cursor.execute(sql)
-        names = [x[0] for x in self.cursor.description]
-        out = [tools.Storage(dict(zip(names, x))) for x in self.cursor.fetchall()]
-        self.cursor.close()
-        return out
+        try:
+            out = []
+            self.cursor = self.conn.cursor()
+            self.cursor.execute(sql)
+            names = [x[0] for x in self.cursor.description]
+            out = [tools.Storage(dict(zip(names, x))) for x in self.cursor.fetchall()]
+            self.cursor.close()
+            return out
+        except Exception, e:
+            print e
+            raise
+        finally:
+            self.cursor.close()
 
     def get_db(self):
         self.db = PostgresqlExtDatabase(self.db_name, user=self.user, password=self.password, host=self.host, register_hstore=False)
         return self.db
 
     def modifyData(self, sql):
-        self.cursor = self.conn.cursor()
         try:
+            self.cursor = self.conn.cursor()
             self.cursor.execute(sql)
             self.conn.commit()
             self.cursor.close()
         except IntegrityError, e:
             self.conn.rollback()
+            print e
             raise IntegrityError(e)
         except Exception, e:
+            print e
+            print sql
             self.conn.rollback()
             raise Exception(e)
         finally:
